@@ -12,29 +12,45 @@ if "token" not in st.session_state:
     st.session_state.token = None
 
 # --- SIDEBAR: LOGIN & SIGNUP ---
+
 with st.sidebar:
-    st.title("🔐 Authentication")
-    auth_mode = st.radio("Choose Mode", ["Login", "Signup"])
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
-    
-    if auth_mode == "Signup":
-        name = st.text_input("Full Name")
-        if st.button("Create Account"):
-            res = requests.post(f"{API_URL}/signup/", json={"email": email, "full_name": name, "password": password})
-            if res.status_code == 200:
-                st.success("Account created!")
-            else:
-                st.error("Signup failed")
+    if st.session_state.token:
+        st.success(" Logged in")
+
+        if st.button(" Logout"):
+            st.session_state.token = None
+            st.rerun()
+
     else:
-        if st.button("Login"):
-            # Using the OAuth2 form data format
-            res = requests.post(f"{API_URL}/login/", data={"username": email, "password": password})
-            if res.status_code == 200:
-                st.session_state.token = res.json()["access_token"]
-                st.success("Logged in!")
-            else:
-                st.error("Invalid credentials")
+        st.title(" Authentication")
+        auth_mode = st.radio("Choose Mode", ["Login", "Signup"])
+        email = st.text_input("Email")
+        password = st.text_input("Password", type="password")
+        
+        if auth_mode == "Signup":
+            name = st.text_input("Full Name")
+            if st.button("Create Account"):
+                res = requests.post(
+                    f"{API_URL}/signup/",
+                    json={"email": email, "full_name": name, "password": password}
+                )
+                if res.status_code == 200:
+                    st.success("Account created!")
+                else:
+                    st.error("Signup failed")
+        else:
+            if st.button("Login"):
+                res = requests.post(
+                    f"{API_URL}/login/",
+                    data={"username": email, "password": password}
+                )
+                if res.status_code == 200:
+                    st.session_state.token = res.json()["access_token"]
+                    st.success("Logged in!")
+                    st.rerun()
+                else:
+                    st.error("Invalid credentials")
+
 
 # --- MAIN DASHBOARD ---
 if st.session_state.token:

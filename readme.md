@@ -3,7 +3,6 @@
 An intelligent full-stack application designed to help users **track, manage, and optimize software subscriptions**.
 It integrates an **AI-powered assistant** to provide insights, suggest cost optimizations, and send **automated renewal alerts** — ensuring you never miss a payment.
 
----
 
 ##  Key Features
 
@@ -38,7 +37,7 @@ It integrates an **AI-powered assistant** to provide insights, suggest cost opti
   * Monthly
   * Yearly billing cycles
 
----
+
 
 ##  Tech Stack
 
@@ -52,7 +51,7 @@ It integrates an **AI-powered assistant** to provide insights, suggest cost opti
 | Scheduler | APScheduler                  |
 | Security  | JWT (JOSE), Passlib (Bcrypt) |
 
----
+
 
 
 
@@ -65,57 +64,47 @@ Make sure you have:
 * Tavily API Key (for web search)
 * Gmail App Password (for email alerts)
 
----
 
 ### 2️ Installation
 
-```bash
+
 # Clone the repository
 git clone <your-repo-link>
 cd AI_Subscription_Manager
 
 # Install dependencies
 pip install -r requirements.txt
-```
+
 
 If installing manually:
 
-```bash
+
 pip install fastapi uvicorn sqlalchemy passlib bcrypt python-jose
 pip install langchain langgraph langchain-openai langchain-community
 pip install streamlit requests python-dotenv apscheduler
-```
 
----
 
 ### 3️ Environment Setup
 
 Create a `.env` file in the root directory:
 
-```env
 OPENAI_API_KEY=your_openai_key
 TAVILY_API_KEY=your_tavily_key
 EMAIL_USER=your_email@gmail.com
 EMAIL_PASS=your_16_character_app_password
-```
 
----
 
 ### 4️ Run the Application
 
 ####  Start Backend (FastAPI)
 
-```bash
 uvicorn main:app --reload
-```
+
 
 ####  Start Frontend (Streamlit)
 
-```bash
 streamlit run app.py
-```
 
----
 
 ##  API Documentation
 
@@ -131,7 +120,7 @@ Once the backend is running, open:
 * `GET /dashboard/` → View spending insights
 * `POST /chat/` → Interact with AI assistant
 
----
+
 
 ##  AI Agent Workflow
 
@@ -149,7 +138,7 @@ The AI agent is built using **LangGraph StateGraph** and follows this flow:
 4. **Respond**
    Provide actionable insights to reduce spending
 
----
+
 
 ##  Example Use Cases
 
@@ -157,7 +146,6 @@ The AI agent is built using **LangGraph StateGraph** and follows this flow:
 *  “Suggest cheaper alternatives for my tools”
 *  “Analyze my spending trends”
 
----
 
 ##  Future Improvements
 
@@ -166,5 +154,19 @@ The AI agent is built using **LangGraph StateGraph** and follows this flow:
 *  Cloud deployment (AWS / Docker)
 *  Mobile-friendly UI
 
----
+
+
+
+##  Screenshots
+
+###  Dashboard
+![alt text](image-1.png)
+
+![alt text](image.png)
+
+###  Add Subscription
+![alt text](image-2.png)
+
+###  AI Assistant
+![alt text](image-3.png)
 
