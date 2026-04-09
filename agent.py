@@ -73,6 +73,18 @@ def get_expiring_subscriptions(config: RunnableConfig):
     return f"Expiring subscriptions: {', '.join(expiring)}" if expiring else "No subscriptions expiring today"
 
 @tool
+def get_highest_subscription(config: RunnableConfig):
+    """Find most expensive subscription"""
+    user_id = config["configurable"].get("user_id")
+    db = SessionLocal()
+    subs = db.query(Subscription).filter(Subscription.user_id == user_id).all()
+    db.close()
+    if not subs: return "No subscriptions found"
+    highest = max(subs, key=lambda x: x.cost)
+    return f"Most expensive is {highest.tool_name} costing {highest.cost}"
+
+
+@tool
 def get_lowest_subscription(config: RunnableConfig):
     """Find cheapest subscription"""
     user_id = config["configurable"].get("user_id")
