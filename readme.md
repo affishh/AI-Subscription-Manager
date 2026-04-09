@@ -3,7 +3,6 @@
 An intelligent full-stack application designed to help users **track, manage, and optimize software subscriptions**.
 It integrates an **AI-powered assistant** to provide insights, suggest cost optimizations, and send **automated renewal alerts** — ensuring you never miss a payment.
 
-
 ##  Key Features
 
 ###  Intelligent AI Assistant
@@ -41,18 +40,15 @@ It integrates an **AI-powered assistant** to provide insights, suggest cost opti
 
 ##  Tech Stack
 
-| Layer     | Technology                   |
-| --------- | ---------------------------- |
-| Backend   | FastAPI (Python)             |
-| Frontend  | Streamlit                    |
-| AI Layer  | LangGraph, LangChain         |
-| LLM       | GPT-4o-mini                  |
-| Database  | SQLAlchemy (SQLite)          |
-| Scheduler | APScheduler                  |
-| Security  | JWT (JOSE), Passlib (Bcrypt) |
-
-
-
+ Layer      Technology                   
+ ---------  ---------------------------- 
+ Backend    FastAPI (Python)             
+ Frontend   Streamlit                    
+ AI Layer   LangGraph, LangChain         
+ LLM        GPT-4o-mini                  
+ Database   SQLAlchemy (SQLite)          
+ Scheduler  APScheduler                  
+ Security   JWT (JOSE), Passlib (Bcrypt) 
 
 
 ### 1️ Prerequisites
@@ -68,24 +64,20 @@ Make sure you have:
 ### 2️ Installation
 
 
-# Clone the repository
+## Clone the repository
 git clone <your-repo-link>
 cd AI_Subscription_Manager
 
-# Install dependencies
+## Install dependencies
 pip install -r requirements.txt
 
-
 If installing manually:
-
-
 pip install fastapi uvicorn sqlalchemy passlib bcrypt python-jose
 pip install langchain langgraph langchain-openai langchain-community
 pip install streamlit requests python-dotenv apscheduler
 
 
 ### 3️ Environment Setup
-
 Create a `.env` file in the root directory:
 
 OPENAI_API_KEY=your_openai_key
