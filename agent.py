@@ -19,6 +19,7 @@ from models import Subscription
 
 from datetime import date
 import json
+load_dotenv()
 
 # ---------------- STATE ---------------- #
 class State(TypedDict):
@@ -40,7 +41,7 @@ def save_memory(user_id: int, query: str):
             data = json.load(f)
     data.append(query)
     with open(filename, "w") as f:
-        json.dump(data[-10:], f) # Keep last 10 queries
+        json.dump(data[-10:], f)
 
 def load_memory(user_id: int):
     filename = f"memory_{user_id}.json"
@@ -111,7 +112,9 @@ def assistant(state: State, config: RunnableConfig):
     
     past_queries = load_memory(user_id)
     system_prompt = SystemMessage(content=(
-        "You are the Skysecure AI Subscription Manager. Use tools to help users. "
+        "You are an intelligent subscription management assistant. "
+        "Always prefer using tools to answer queries about subscriptions, costs, and renewals."
+        "Use memory for personalization and context."
         f"Context: The user previously asked about: {', '.join(past_queries[-3:])}"
     ))
     return {"messages": [llm_with_tools.invoke([system_prompt] + state["messages"])]}

@@ -1,34 +1,32 @@
 import os
 import smtplib
+import models
+import database
 from email.message import EmailMessage
 from dotenv import load_dotenv
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import date, datetime, timedelta
-from langgraph.checkpoint.memory import MemorySaver
-
-# Load Environment Variables
-load_dotenv()
-
-import models
-import database
-from agent import graph
-from langchain_core.messages import HumanMessage
-
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from apscheduler.schedulers.background import BackgroundScheduler
-
-from auth import hash_password, verify_password, create_access_token
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import jwt, JWTError
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+
+# Import local modules
+from auth import hash_password, verify_password, create_access_token
+from agent import graph
+from langchain_core.messages import HumanMessage
 
 # ---------------- CONFIG ---------------- #
+load_dotenv()
 EMAIL_ADDRESS = os.getenv("EMAIL_USER") 
 EMAIL_PASSWORD = os.getenv("EMAIL_PASS")
+SECRET_KEY = "mysecretkey" #
 
-# ---------------- APP ---------------- #
+# ---------------- APP & SCHEDULER ---------------- #
 app = FastAPI(title="AI Subscription Manager")
+scheduler = BackgroundScheduler()
 
 app.add_middleware(
     CORSMiddleware,
@@ -44,7 +42,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 # ---------------- AUTH ---------------- #
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(database.get_db)):
     try:
-        payload = jwt.decode(token, "mysecretkey", algorithms=["HS256"])
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
         user_id = payload.get("user_id")
         if user_id is None:
             raise HTTPException(status_code=401, detail="Invalid token")
@@ -53,7 +51,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-# ---------------- MODELS ---------------- #
+# ---------------- SCHEMAS ---------------- #
 class UserCreate(BaseModel):
     email: str
     full_name: str
@@ -84,39 +82,55 @@ def send_email_notification(to_email, tool_name, r_date, cost):
     msg['To'] = to_email
 
     try:
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+        with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+            smtp.starttls() 
             smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
             smtp.send_message(msg)
-            print(f"SUCCESS: Alert sent to {to_email}")
+            print(f"SUCCESS: Alert sent to {to_email} for {tool_name}")
     except Exception as e:
         print(f"FAILED to send email: {e}")
 
-# ---------------- SCHEDULER ---------------- #
+# ---------------- SCHEDULER TASK ---------------- #
 def check_for_upcoming_renewals():
+    print(f"DEBUG: Running renewal check at {datetime.now()}")
     db = database.SessionLocal()
-    # Logic: Today + 2 Days
-    target_date = date.today() + timedelta(days=2)
-    
-    upcoming = db.query(models.Subscription).filter(
-        models.Subscription.renewal_date == target_date
-    ).all()
-    
-    for sub in upcoming:
-        user = db.query(models.User).filter(models.User.id == sub.user_id).first()
-        if user and EMAIL_ADDRESS:
-            send_email_notification(user.email, sub.tool_name, sub.renewal_date, sub.cost)
-        else:
-            print(f"LOG: Renewal due for {sub.tool_name} in 2 days (No email sent).")
-    db.close()
+    try:
+        target_date = date.today() + timedelta(days=2)
+
+        upcoming = db.query(models.Subscription).filter(
+            models.Subscription.renewal_date == target_date
+        ).all()
+        
+        print(f"DEBUG: Found {len(upcoming)} subscriptions renewing on {target_date}")
+
+        for sub in upcoming:
+            user = db.query(models.User).filter(models.User.id == sub.user_id).first()
+            if user and EMAIL_ADDRESS:
+                send_email_notification(user.email, sub.tool_name, sub.renewal_date, sub.cost)
+            else:
+                print(f"LOG: Skipping {sub.tool_name}. Reason: User found={bool(user)}, Email config={bool(EMAIL_ADDRESS)}")
+    except Exception as e:
+        print(f"SCHEDULER ERROR: {e}")
+    finally:
+        db.close()
 
 @app.on_event("startup")
 def start_scheduler():
-    scheduler = BackgroundScheduler()
-    # Runs the check every 24 hours
-    scheduler.add_job(check_for_upcoming_renewals, 'interval', hours=24, next_run_time=datetime.now())
-    scheduler.start()
+    if not scheduler.running:
+        scheduler.add_job(
+            check_for_upcoming_renewals, 
+            'interval', 
+            hours=24, 
+            next_run_time=datetime.now()
+        )
+        scheduler.start()
+        print("INFO: Background Scheduler Started")
 
-# ---------------- APIs ---------------- #
+# ---------------- ENDPOINTS ---------------- #
+@app.get("/")
+def home():
+    return {"status": "AI Subscription Manager Active", "sender_configured": bool(EMAIL_ADDRESS)}
+
 @app.post("/signup/")
 def signup(user: UserCreate, db: Session = Depends(database.get_db)):
     new_user = models.User(email=user.email, full_name=user.full_name, password=hash_password(user.password))
@@ -137,7 +151,6 @@ def create_subscription(request: SubscriptionRequest, current_user: models.User 
     if request.renewal_date:
         r_date = request.renewal_date
     else:
-        # Auto-calc based on cycle
         days = {"weekly": 7, "monthly": 30, "yearly": 365}
         r_date = p_date + timedelta(days=days.get(request.billing_cycle.lower(), 30))
 
@@ -147,7 +160,7 @@ def create_subscription(request: SubscriptionRequest, current_user: models.User 
     )
     db.add(new_sub)
     db.commit()
-    return {"message": "Created", "data": request}
+    return {"message": "Created", "data": {"tool": request.tool_name, "renewal": r_date}}
 
 @app.get("/dashboard/")
 def get_dashboard(current_user: models.User = Depends(get_current_user), db: Session = Depends(database.get_db)):

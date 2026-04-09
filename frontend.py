@@ -22,7 +22,10 @@ with st.sidebar:
         name = st.text_input("Full Name")
         if st.button("Create Account"):
             res = requests.post(f"{API_URL}/signup/", json={"email": email, "full_name": name, "password": password})
-            st.success("Account created! Please login.")
+            if res.status_code == 200:
+                st.success("Account created!")
+            else:
+                st.error("Signup failed")
     else:
         if st.button("Login"):
             # Using the OAuth2 form data format

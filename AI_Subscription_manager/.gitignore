@@ -1,0 +1,46 @@
+# ----------------------
+
+# Python
+
+# ----------------------
+
+**pycache**/
+*.py[cod]
+*$py.class
+
+
+# Environment Variables
+
+# ----------------------
+
+.env
+.env.*
+
+# ----------------------
+
+# Database
+
+# ----------------------
+
+*.db
+*.sqlite3
+
+
+.DS_Store
+Thumbs.db
+
+-
+
+# FastAPI / Uvicorn
+
+
+*.pid
+
+
+# LangChain / AI
+
+# ----------------------
+
+*.jsonl
+*.cache
+*.json
