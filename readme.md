@@ -1,66 +1,170 @@
-# AI-Powered Subscription Manager
-​An intelligent full-stack application designed to help users track, manage, and optimize their software subscriptions. This system features an AI Agent built with LangGraph to provide financial insights and automated email alerts to prevent missed renewals.
+#  AI-Powered Subscription Manager
 
-​# Key Features
-**​Intelligent AI Assistant: Interact with a chatbot that understands your spending habits, suggests cheaper alternatives using web search, and analyzes your subscription data.
+An intelligent full-stack application designed to help users **track, manage, and optimize software subscriptions**.
+It integrates an **AI-powered assistant** to provide insights, suggest cost optimizations, and send **automated renewal alerts** — ensuring you never miss a payment.
 
-**​Proactive Renewal Alerts: Automated background scheduler that sends email notifications 2 days before a subscription is due.
+---
 
-**​Secure Authentication: Implements OAuth2 with JWT (JSON Web Tokens) for secure user login and strict data isolation.
+##  Key Features
 
-**​Dynamic Dashboard: A clean Streamlit interface to visualize total spending and monitor upcoming obligations.
-​
-**Automated Logic: Automatically calculates renewal dates based on weekly, monthly, or yearly billing cycles.
-​
-**Tech Stack
-​Backend: FastAPI (Python)
-​AI Orchestration: LangGraph, LangChain
-​LLM: OpenAI GPT-4o-mini
-​Database: SQLAlchemy (SQLite)
-​Frontend: Streamlit
-​Task Scheduling: APScheduler
-​Security: JOSE (JWT), Passlib (Bcrypt)
-​
-**Getting Started
-​1. Prerequisites
-​Python 3.10+
-​OpenAI API Key
-​Tavily API Key (for web search)
-​Gmail App Password (for email alerts)
+###  Intelligent AI Assistant
 
-​2. Installation
-**Clone the repository
+* Chat-based assistant that understands your subscription data
+* Suggests **cheaper alternatives** using real-time web search
+* Provides **spending analysis and optimization insights**
+
+###  Proactive Renewal Alerts
+
+* Automated email notifications before renewal dates
+* Background scheduler ensures alerts are sent **on time (2 days prior)**
+
+###  Secure Authentication
+
+* OAuth2-based login system
+* JWT (JSON Web Tokens) for secure sessions
+* User-specific data isolation
+
+###  Dynamic Dashboard
+
+* Clean and interactive UI built with Streamlit
+* View all subscriptions in one place
+* Track total spending and upcoming renewals
+
+###  Automated Subscription Logic
+
+* Auto-calculates renewal dates based on:
+
+  * Weekly
+  * Monthly
+  * Yearly billing cycles
+
+---
+
+##  Tech Stack
+
+| Layer     | Technology                   |
+| --------- | ---------------------------- |
+| Backend   | FastAPI (Python)             |
+| Frontend  | Streamlit                    |
+| AI Layer  | LangGraph, LangChain         |
+| LLM       | GPT-4o-mini                  |
+| Database  | SQLAlchemy (SQLite)          |
+| Scheduler | APScheduler                  |
+| Security  | JWT (JOSE), Passlib (Bcrypt) |
+
+---
+
+
+
+### 1️ Prerequisites
+
+Make sure you have:
+
+* Python 3.10+
+* OpenAI API Key
+* Tavily API Key (for web search)
+* Gmail App Password (for email alerts)
+
+---
+
+### 2️ Installation
+
+```bash
+# Clone the repository
 git clone <your-repo-link>
 cd AI_Subscription_Manager
 
-#Install dependencies
+# Install dependencies
 pip install -r requirements.txt
-or manually install the bellow commands
-pip install fastapi uvicorn sqlalchemy passlib bcrypt python-jose pip install langchain langgraph langchain-openai langchain-community
+```
 
-3. Environment Setup
-​Create a .env file in the root directory:
+If installing manually:
+
+```bash
+pip install fastapi uvicorn sqlalchemy passlib bcrypt python-jose
+pip install langchain langgraph langchain-openai langchain-community
+pip install streamlit requests python-dotenv apscheduler
+```
+
+---
+
+### 3️ Environment Setup
+
+Create a `.env` file in the root directory:
+
+```env
 OPENAI_API_KEY=your_openai_key
 TAVILY_API_KEY=your_tavily_key
 EMAIL_USER=your_email@gmail.com
 EMAIL_PASS=your_16_character_app_password
+```
 
-4. Running the Application
-Start the Backend:
+---
+
+### 4️ Run the Application
+
+####  Start Backend (FastAPI)
+
+```bash
 uvicorn main:app --reload
+```
 
-Start the Frontend:
-streamlit run frontend.py
+####  Start Frontend (Streamlit)
 
-API Endpoints (Swagger)
-Once the backend is running, visit http://127.0.0.1:8000/docs to explore:
-POST /signup/ & POST /login/: User management.
-POST /subscriptions/: Create new tools with purchase and renewal dates.
-GET /dashboard/: Retrieve spending analytics.
-POST /chat/: Converse with the AI Agent.
+```bash
+streamlit run app.py
+```
 
-**AI Agent Logic
-The agent uses a StateGraph to:
-Retrieve: Fetch the user's current subscriptions from the database.
-Search: Use Tavily to find real-time pricing and alternatives.
-Analyze: Compare internal costs with market data to provide actionable optimization advice.
+---
+
+##  API Documentation
+
+Once the backend is running, open:
+
+👉 http://127.0.0.1:8000/docs
+
+### Available Endpoints:
+
+* `POST /signup/` → Register new user
+* `POST /login/` → Authenticate user
+* `POST /subscriptions/` → Add subscription
+* `GET /dashboard/` → View spending insights
+* `POST /chat/` → Interact with AI assistant
+
+---
+
+##  AI Agent Workflow
+
+The AI agent is built using **LangGraph StateGraph** and follows this flow:
+
+1. **Retrieve**
+   Fetch user subscription data from the database
+
+2. **Search**
+   Use Tavily API for real-time pricing & alternatives
+
+3. **Analyze**
+   Compare current subscriptions with market options
+
+4. **Respond**
+   Provide actionable insights to reduce spending
+
+---
+
+##  Example Use Cases
+
+*  “How can I reduce my monthly subscription cost?”
+*  “Suggest cheaper alternatives for my tools”
+*  “Analyze my spending trends”
+
+---
+
+##  Future Improvements
+
+*  Advanced analytics dashboard (charts & trends)
+*  Customizable email alert preferences
+*  Cloud deployment (AWS / Docker)
+*  Mobile-friendly UI
+
+---
+
